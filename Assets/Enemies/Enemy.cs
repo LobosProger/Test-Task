@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
 	private Waypoint waypoint;
 	private Animator animator;
 
-	//* Для того, чтобы не отображать UI - прикрепляем ссылку на канвас
+	//* Для того, чтобы не отображать UI после убийства врага - прикрепляем ссылку на канвас
 	[SerializeField]
 	private Canvas canvas;
 	//* Здесь прикрепляем линию на здоровье
