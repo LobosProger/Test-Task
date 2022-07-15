@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.AI;
 public class Player : MonoBehaviour
 {
-	private static List<Waypoint> Waypoints = new List<Waypoint>();
+	private static SortedList<int, Waypoint> Waypoints = new SortedList<int, Waypoint>();
 
 	private NavMeshAgent agent;
 	private Animator animator;
 
-	private int index; //* Индекс, отслеживающий текущий waypoint в массиве 
-	private int CurrentIndexAttackPoint;
+	//private int index = 0; //* Индекс, отслеживающий текущий waypoint в массиве 
+	private int CurrentIndexAttackPoint = 0;
 
 	private bool followingOnWaypoints;
 	private const float angleSpeed = 14; //* Скорость разворота игрока вокруг своей оси
@@ -37,8 +37,7 @@ public class Player : MonoBehaviour
 
 		//! Из-за особенностей игрового движка индексу назначаем не 0, а индекс самого последнего элемента,
 		//! т.к. новые добавленные точки (waypoints) хранятся в самом начале списка, т.е. последний созданный waypoint на карте имеет индекс 0, т.е. он первый
-		index = Waypoints.Count - 1;
-		CurrentIndexAttackPoint = index;
+		CurrentIndexAttackPoint = Waypoints.Count - 1;
 
 		animator.SetTrigger("Idle"); //* Назначаем состояние игроку в начале игры
 	}
@@ -68,30 +67,30 @@ public class Player : MonoBehaviour
 
 				//* Если в данном вейпоинте все враги были уничтожены и мы не дошли до конечного вейпоинта, то изменяем индекс и заставляем игрока перемещаться к следующему вейпоинту
 				//* В противном случае, возобновляем игру
-				if (Waypoints[CurrentIndexAttackPoint].AreEnemiesDestroyed())
+				if (Waypoints.Values[CurrentIndexAttackPoint].AreEnemiesDestroyed())
 				{
-					if (index >= 0)
+					if (CurrentIndexAttackPoint > 0)
+					{
+						CurrentIndexAttackPoint--;
 						StartMove();
+					}
 					else
 						StartCoroutine(RestartGame());
 				}
 			}
 
 			//* Этот фрагмент кода отвечает за перемещение игрока по вейпоинтам
-			if (Waypoints.Count > 0 && followingOnWaypoints && index >= 0)
+			if (Waypoints.Count > 0 && followingOnWaypoints && CurrentIndexAttackPoint >= 0)
 			{
 				//* Если игрок еще не дошел до вейпоинта, то включаем NavMesh
 				//! Используем вместо Vector3.Distance другую операцию по определению расстояния
-				if ((Waypoints[index].transform.position - transform.position).sqrMagnitude > 0.0169f)
+				if ((Waypoints.Values[CurrentIndexAttackPoint].transform.position - transform.position).sqrMagnitude > 0.0169f)
 				{
-					CurrentIndexAttackPoint = index;
-					agent.SetDestination(Waypoints[index].transform.position);
+					//CurrentIndexAttackPoint = index;
+					agent.SetDestination(Waypoints.Values[CurrentIndexAttackPoint].transform.position);
 				}
 				else //* В противном случае, изменяем состояние игрока
-				{
-					index--;
 					StayOnAttackPosition();
-				}
 			}
 		}
 	}
@@ -110,8 +109,8 @@ public class Player : MonoBehaviour
 	}
 
 	//* Добавляем вейпоинт для того, чтобы игрок мог двигаться по маршруту
-	public static void AddWaypoint(Waypoint waypoint)
-	=> Waypoints.Add(waypoint);
+	public static void AddWaypoint(int siblingIndex, Waypoint waypoint)
+	=> Waypoints.Add(siblingIndex, waypoint);
 
 	private void StayOnAttackPosition()
 	{
