@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
 	private NavMeshAgent agent;
 	private Animator animator;
 
-	//private int index = 0; //* Индекс, отслеживающий текущий waypoint в массиве 
+	//* Индекс, отслеживающий текущий waypoint в массиве 
 	private int CurrentIndexAttackPoint = 0;
 
 	private bool followingOnWaypoints;
