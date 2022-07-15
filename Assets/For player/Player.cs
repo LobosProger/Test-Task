@@ -35,8 +35,8 @@ public class Player : MonoBehaviour
 		animator = GetComponent<Animator>();
 		agent = GetComponent<NavMeshAgent>();
 
-		//! Из-за особенностей игрового движка индексу назначаем не 0, а индекс самого последнего элемента,
-		//! т.к. новые добавленные точки (waypoints) хранятся в самом начале списка, т.е. последний созданный waypoint на карте имеет индекс 0, т.е. он первый
+		//* Назначаем индекс
+		//* => Самый последний элемент - самый первый добавленный вейпоинт
 		CurrentIndexAttackPoint = Waypoints.Count - 1;
 
 		animator.SetTrigger("Idle"); //* Назначаем состояние игроку в начале игры
